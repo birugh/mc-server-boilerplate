@@ -1,6 +1,9 @@
 .env*
 !.env.example
+
 .playit.env
+.mc.env
+.system.env
 
 /data
 rcon_password.txt

@@ -36,7 +36,8 @@ services:
         max-file: "5"
 
     env_file:
-      - .env
+      - .internal.env
+      - .mc.env
     secrets:
       - rcon_password
     volumes:
