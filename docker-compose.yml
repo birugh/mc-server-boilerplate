@@ -13,13 +13,17 @@ services:
     stdin_open: false
 
     security_opt:
-      - no-new-privileges:true
+      - seccomp:unconfined
     cap_drop:
       - ALL
     user: "1000:1000"
     tmpfs:
       - /tmp:exec,mode=1777
       - /run
+
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
 
     deploy:
       resources:
