@@ -1,13 +1,14 @@
 services:
-  mc:
+  mc-server:
     image: itzg/minecraft-server:java25-jdk@sha256:f6c674167d6a62402950f8a28e25a46f4d69c223de18fa5b10d49341908f87aa
     container_name: meow-smp
 
     ports:
-          - "25565:25565/tcp"
-          - "19132:19132/udp"
+      - "127.0.0.1:25565:25565/tcp"
+    #   - "127.0.0.1:19132:19132/udp"
     
     pull_policy: never
+    read_only: true
     tty: false
     stdin_open: false
 
@@ -15,10 +16,24 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    read_only: true
     user: "1000:1000"
     tmpfs:
       - /tmp:exec,mode=1777
+      - /run
+
+    deploy:
+      resources:
+        limits:
+          memory: 4608M
+          cpus: '2.5'
+        reservations:
+          memory: 1024M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
     env_file:
       - .env
