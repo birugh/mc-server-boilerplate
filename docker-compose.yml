@@ -43,6 +43,17 @@ services:
       - ./data:/data
     restart: unless-stopped
 
+  playit:
+    image: ghcr.io/playit-cloud/playit-agent:1.0.10@sha256:ca4766ced6e5bcee19137337808ec8fee5867c0910ac737efbb0bb452c378521
+    container_name: meow-smp-tunnel
+    restart: unless-stopped
+    env_file:
+      - .playit.env
+    volumes:
+      - ./playit_data:/etc/playit
+    depends_on:
+      - mc-server
+
 secrets:
   rcon_password:
     file: ./rcon_password.txt
