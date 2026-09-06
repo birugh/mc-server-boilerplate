@@ -1,2 +1,5 @@
 .env*
 !.env.example
+
+/data
+rcon_password.txt
