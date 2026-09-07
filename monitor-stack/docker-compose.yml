@@ -1,0 +1,80 @@
+services:
+  prometheus:
+    # Last updated Monday, September 7 2026
+    image: dhi.io/prometheus:3.14.0-debian13@sha256:f18dc10d186c66cf49d6e165f47bd5643dc27f760b20f9ff1d29c690f5da5808
+
+    networks:
+      - monitoring-network
+      - mc-monitoring
+
+    user: "65532:65532"
+
+    pull_policy: never
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,mode=1777
+
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+
+  grafana:
+    # Last updated Monday, September 7 2026
+    image: dhi.io/grafana:13.2-debian13@sha256:62361f14d5a2cabfae82104d34aa8a2a753f488a365a3bd2f31c142c4dd82b4f
+
+    networks:
+      - monitoring-network
+
+    user: "65532:65532"
+
+    pull_policy: never
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,mode=1777    
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+
+networks:
+  monitoring-network:
+
+  mc-monitoring:
+    external: true
