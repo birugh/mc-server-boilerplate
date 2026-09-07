@@ -6,6 +6,8 @@ services:
     networks:
       - monitoring-network
       - mc-monitoring
+    # ports:
+    #   - "127.0.0.1:9090:9090"
 
     user: "65532:65532"
 
@@ -17,9 +19,6 @@ services:
     cap_drop:
       - ALL
 
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev,mode=1777
-
     deploy:
       resources:
         limits:
@@ -29,9 +28,11 @@ services:
           memory: 256M
           cpus: "0.25"
 
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,mode=1777
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
+      - prometheus-data:/var/prometheus
     restart: unless-stopped
 
   grafana:
@@ -40,6 +41,8 @@ services:
 
     networks:
       - monitoring-network
+    ports:
+      - "3000:3000"
 
     user: "65532:65532"
 
@@ -64,8 +67,6 @@ services:
       - /tmp:rw,noexec,nosuid,nodev,mode=1777    
     volumes:
       - ./grafana/data:/var/lib/grafana
-    ports:
-      - "3000:3000"
     depends_on:
       - prometheus
     restart: unless-stopped
