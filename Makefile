@@ -1,7 +1,8 @@
 .PHONY: minecraftup minecraftdown \
         minecraftps minecraftlogs \
         monitorup monitordown \
-        monitorps monitorlogs
+        monitorps monitorlogs \
+				allup alldown
 
 SERVICES ?=
 
@@ -10,6 +11,49 @@ SERVICE_LIST = $(subst $(comma), ,$(SERVICES))
 
 initnet:
 	./scripts/init-network.sh
+
+# All Stacks
+allup:
+	@echo "==> Starting Minecraft Stack..."
+	@docker compose \
+		-f minecraft-stack/docker-compose.yml \
+		up -d $(SERVICE_LIST) || { \
+			echo "ERROR: Failed to start Minecraft Stack."; \
+			exit 1; \
+		}
+	@echo "==> Minecraft Stack started successfully."
+	@echo
+	@echo "==> Starting Monitor Stack..."
+	@docker compose \
+		-f monitor-stack/docker-compose.yml \
+		up -d $(SERVICE_LIST) || { \
+			echo "ERROR: Failed to start Monitor Stack."; \
+			exit 1; \
+		}
+	@echo "==> Monitor Stack started successfully."
+	@echo
+	@echo "==> All stacks started successfully."
+
+alldown:
+	@echo "==> Stopping Monitor Stack..."
+	@docker compose \
+		-f monitor-stack/docker-compose.yml \
+		down --remove-orphans || { \
+			echo "ERROR: Failed to stop Monitor Stack."; \
+			exit 1; \
+		}
+	@echo "==> Monitor Stack stopped successfully."
+	@echo
+	@echo "==> Stopping Minecraft Stack..."
+	@docker compose \
+		-f minecraft-stack/docker-compose.yml \
+		down --remove-orphans || { \
+			echo "ERROR: Failed to stop Minecraft Stack."; \
+			exit 1; \
+		}
+	@echo "==> Minecraft Stack stopped successfully."
+	@echo
+	@echo "==> All stacks stopped successfully."
 
 # Minecraft Stack
 minecraftup:
@@ -21,6 +65,11 @@ minecraftdown:
 	docker compose \
 		-f minecraft-stack/docker-compose.yml \
 		down --remove-orphans
+
+minecraftrestart:
+	docker compose \
+		-f minecraft-stack/docker-compose.yml \
+		restart $(SERVICE_LIST)
 
 minecraftps:
 	watch -n 1 -d \
@@ -52,6 +101,11 @@ monitordown:
 	docker compose \
 		-f monitor-stack/docker-compose.yml \
 		down --remove-orphans
+
+monitorrestart:
+	docker compose \
+		-f monitor-stack/docker-compose.yml \
+		restart $(SERVICE_LIST)
 
 monitorps:
 	watch -n 1 -d \
